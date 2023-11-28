@@ -1,6 +1,8 @@
 
 <?php
     include 'header.php';
+    include 'includes/checkerror.inc.php';
+
     if($user_logged)
     {
         header("location: home.php");
@@ -33,16 +35,10 @@
 <?php
     if(isset($_GET["error"]))
     {
-        if(isset($_GET["error"])){
-            if($_GET["error"] == "wronglogin")
-            {
-                echo "<p class='error_message'>Špatné uživatelské jméno nebo heslo.</p>";
-            }
-            else if($_GET["error"] == "passdontmatch")
-            {
-                echo "<p class='error_message'>Password dont match.</p>";
-            }
-        }
+  
+        $error = new CheckError($_GET["error"]);
+        $errorStr = $error->getError();
+        echo "<p class='error_message'>$errorStr</p>";
     }
 
 ?>
