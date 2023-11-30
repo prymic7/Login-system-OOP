@@ -76,7 +76,7 @@ class RegisterUser
     {
         if(empty($username) || empty($password) || empty($email) || empty($date) || empty($firstname) || empty($secondname) )
         {
-            return true;
+            return true; 
         }
         return false;
     }
