@@ -80,7 +80,7 @@ class RegisterUser
         }
         return false;
     }
-
+ 
     public function invalidUsername($username)
     {
         if(!preg_match("/^[a-zA-Z0-9]*$/", $username))
