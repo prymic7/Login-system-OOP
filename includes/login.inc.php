@@ -14,6 +14,7 @@ class LoginUser
         $this->username = $username;
         $this->password = $password;
         $this->connection = $connection;
+
         $this->checkCredentials();
     }
 
@@ -49,6 +50,11 @@ class LoginUser
             header("location: ../login.php?error=wronglogin");
             exit();
         }
+        else if(!$this->checkVerification())
+        {
+            header("location:../login.php?error=accountnotverified");
+            exit();
+        }
         else
         {
             $hashed_pass = $usernameExists["password"];
@@ -68,6 +74,33 @@ class LoginUser
                 $_SESSION["username"] = $usernameExists["username"];
                 header("location: ../home.php");
             }
+        }
+    }
+
+    public function checkVerification()
+    {
+        $sql = "SELECT verified FROM userinfo WHERE username = ?";
+        $stmt = mysqli_stmt_init($this->connection);
+        if(!mysqli_stmt_prepare($stmt, $sql))
+        {
+            header("location: ../register.php?error=stmtfailed");
+            exit();
+        }
+        mysqli_stmt_bind_param($stmt, "s", $this->username);
+        mysqli_stmt_execute($stmt);
+
+        $resultData = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($resultData);
+
+        mysqli_stmt_close($stmt);
+
+        if($row["verified"] == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

@@ -1,7 +1,12 @@
 
 <?php
-include "registerfunctions.inc.php";
 require_once "dbc.inc.php";
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require '../phpmailer/src/PHPMailer.php';
+require '../phpmailer/src/Exception.php';
+require '../phpmailer/src/SMTP.php';
+
 
 class RegisterUser
 {
@@ -111,20 +116,43 @@ class RegisterUser
 
     public function createUser($connection, $username, $password, $email, $datebirth, $firstname, $secondname)
     {
-        $sql = "INSERT INTO userinfo (username, password, email, firstname, secondname) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO userinfo (username, password, email, firstname, secondname, verification_token,
+         vt_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_stmt_init($connection);
         if (!mysqli_stmt_prepare($stmt, $sql)) {
             header("location: ../register.php?error=stmtfailed");
             exit();
         }
-    
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+        $verifyID = md5(uniqid(rand(), true));
         $hashedPass = password_hash($password, PASSWORD_DEFAULT);
-        mysqli_stmt_bind_param($stmt, "sssss", $username, $hashedPass, $email, $firstname, $secondname);
-
+        mysqli_stmt_bind_param($stmt, "sssssss", $username, $hashedPass, $email, $firstname, $secondname, $verifyID, $expiresAt);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         $_SESSION['allowedAccess'] = true;
         $userId = mysqli_insert_id($connection);
+
+        $verifyLink = "https://localhost/WebForApp/includes/verify.inc.php?token=$verifyID";
+        $subject = "AeroGuide verification";
+        $message = "Click the following link to verify your account: <a href=$verifyLink>THIS</a>";
+        // $message = "Click the following link to verify your account: <a href=\"$verifyLink\">THIS</a>";
+
+
+        $phpmailer = new PHPMailer(true);
+        $phpmailer->isSMTP();
+        $phpmailer->Host = 'smtp.gmail.com';
+        $phpmailer->SMTPAuth = true;
+        $phpmailer->Username = "aeroguidetests@gmail.com";
+        $phpmailer->Password = "urqgifwetjlocesz";
+        $phpmailer->SMTPSecure = "ssl";
+        $phpmailer->Port = 465;
+        $phpmailer->setFrom("aeroguidetests@gmail.com");
+        $phpmailer->addAddress($email);
+        $phpmailer->isHTML(true);
+        $phpmailer->Subject = $subject;
+        $phpmailer->Body = $message;
+        $phpmailer->send();
+
         return $userId;
     }
 }

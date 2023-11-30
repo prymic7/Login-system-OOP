@@ -28,7 +28,7 @@ class CheckError
             case "wronglogin":
                 $this->errorFoundStr = "Špatné uživatelské jméno nebo heslo.</p>";
                 break;
-            case "wronglogin":
+            case "passdontmatch":
                 $this->errorFoundStr = "Password dont match.";
                 break;
         }

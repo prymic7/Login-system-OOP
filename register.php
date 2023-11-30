@@ -41,7 +41,8 @@
     if(isset($_GET["error"]))
     {
         $error = new CheckError($_GET["error"]);
-        echo $error->getError();
+        $errorStr = $error->getError();
+        echo "<p class='error_message'>$errorStr</p>";
     }
 ?>
 

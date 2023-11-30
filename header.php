@@ -1,5 +1,7 @@
 <?php
-
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/Exception.php';
+require 'phpmailer/src/SMTP.php';
 session_start();
 $logged_user_id = isset($_SESSION["id"]) ? $_SESSION["id"] : null;
 $logged_username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
